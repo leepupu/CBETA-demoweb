@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="bootstrap-4.2.1-dist/css/bootstrap.min.css">
+
+  <title>Hello, world!</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <H1>demo 程式</H1>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <form>
+          <div class="form-group">
+            <label for="text">文字區</label>
+            <textarea class="form-control" id="text" rows="20"></textarea>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <form class="form-inline">
+          <div class="form-group mb-2">
+            <label for="search"></label>
+            <input type="email" class="form-control" id="search" placeholder="搜索內容">
+          </div>
+          <button type="button" id="searchBtn" class="btn btn-primary  mx-sm-3  mb-2">搜尋</button>
+        </form>
+      </div>
+      <div class="col-md-3 offset-md-3">
+        <div class="form-group">
+          <form class="form-inline">
+            <input id="file" type="file" style="display: none">
+            <button type="button" id="load" class="btn ml-auto btn-primary">載入</button>
+            <button type="button" id="save" class="btn ml-auto btn-primary">儲存</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="jquery-3.3.1.min.js"></script>
+
+  <script>
+    $(document).ready(() => {
+      $('#load').click(() => {
+        $("#file").click();
+
+        $('#file').change(() => {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var text = reader.result;
+            console.log(text);
+            $("#text").val(text);
+          }
+          reader.readAsText($('#file')[0].files[0]);
+        });
+
+        function Jump(line) {
+          var lineHeight = $('#text').css('line-height').replace('px', '');
+          var jump = (line - 1) * lineHeight;
+          $('#text')[0].scrollTop = jump;
+        }
+
+        function destroyClickedElement(event) {
+          document.body.removeChild(event.target);
+        }
+
+        function saveTextAsFile() {
+          var textToSave = $("#text").val();
+          var textToSaveAsBlob = new Blob([textToSave], { type: "text/plain" });
+          var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+          var fileNameToSaveAs = $('#file')[0].files[0].name;
+
+          var downloadLink = document.createElement("a");
+          downloadLink.download = fileNameToSaveAs;
+          downloadLink.innerHTML = "Download File";
+          downloadLink.href = textToSaveAsURL;
+          downloadLink.onclick = destroyClickedElement;
+          downloadLink.style.display = "none";
+          document.body.appendChild(downloadLink);
+
+          downloadLink.click();
+        }
+
+        $('#searchBtn').click(() => {
+          const text = $("#text").val();
+          const toSearch = $('#search').val();
+          const idx = text.indexOf(toSearch);
+          $('#text').focus();
+          $('#text')[0].setSelectionRange(idx, idx + toSearch.length);
+          const line = $('#text')[0].value.substr(0, $('#text')[0].selectionStart).split("\n").length;
+          console.log('line at ', line);
+          Jump(line);
+        });
+
+        $('#save').click(() => {
+          saveTextAsFile();
+        });
+      })
+    });
+  </script>
+</body>
+
+</html>
